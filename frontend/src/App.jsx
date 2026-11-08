@@ -16,7 +16,7 @@ function App() {
 
   
 useEffect(() => {
-  fetch('https://kinetic-loop-backend.onrender.com/api/products')
+  fetch('http://localhost:5000/api/products')
     .then((response) => {
       if (!response.ok) {
         throw new Error('Failed to fetch products')
@@ -84,7 +84,7 @@ return (
   className="cart-counter"
   onClick={() => setIsCartOpen(!isCartOpen)}
 >
-  🛍️ Bag ({cart.length}) — ₹{cartTotal.toLocaleString('en-IN')}
+ 🛍️ Bag ({cart.length}) — ₹{cartTotal.toLocaleString('en-IN')}
 </button>
 
 
@@ -150,7 +150,7 @@ return (
         className="checkout-close"
         onClick={() => setIsCheckoutOpen(false)}
       >
-        × Close
+        Ã— Close
       </button>
 
       <h2>Checkout</h2>
@@ -164,7 +164,7 @@ return (
 
   try {
   
-    const response = await fetch('https://kinetic-loop-backend.onrender.com/api/orders', {
+    const response = await fetch('http://localhost:5000/api/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -434,3 +434,4 @@ return (
 }
 
 export default App
+
