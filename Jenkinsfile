@@ -13,7 +13,7 @@
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev',
+                git branch: 'dev', credentialsId: 'kinetic-github-token',
                     url: 'https://github.com/shreyas029/Kinetic-DevOps.git'
             }
         }
@@ -42,4 +42,5 @@
         }
     }
 }
+
 
