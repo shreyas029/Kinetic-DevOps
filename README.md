@@ -1,299 +1,219 @@
+﻿# Kinetic Loop — DevOps Internship Assignment
 
-# KINETIC LOOP
+## Project Overview
 
-### Energy-Harvesting Smartwatch Strap E-Commerce Platform
+Kinetic Loop is a full-stack smartwatch strap e-commerce application.
 
-KINETIC LOOP is a full-stack academic prototype for an
-e-commerce website selling energy-harvesting smartwatch
-straps.
-
-The application demonstrates product browsing, a shopping
-cart, demo checkout, PostgreSQL order storage, Redis caching,
-real-time WebSocket notifications, and a bonus C++ Crow API.
+This repository demonstrates containerization using Docker, multi-service deployment using Docker Compose, and a Jenkins CI pipeline with Checkout, Build, and Deploy stages.
 
 ## Technology Stack
 
-| Component | Technology |
-|---|---|
-| Frontend | React, Vite, CSS |
-| Backend | Node.js, Express |
-| Database | PostgreSQL |
-| Caching | Redis |
-| Real-time Communication | WebSockets (ws) |
-| Bonus API | C++17, Crow Framework |
-| Hosting | Render |
-| CI Testing | GitHub Actions |
-| Version Control | Git, GitHub |
+- Frontend: React, Vite, Nginx
+- Backend: Node.js, Express
+- Database: PostgreSQL
+- Cache: Redis
+- Containerization: Docker and Docker Compose
+- CI Tool: Jenkins
+- Version Control: Git and GitHub
 
-## Features
+## 1. Prerequisites
 
-- Responsive product catalog
-- Solar Loop, Thermal Loop, and Motion Loop products
-- Shopping cart and order total calculation
-- Demo checkout and order confirmation
-- Persistent order storage using PostgreSQL
-- Redis product caching with a 300-second expiration
-- Real-time WebSocket order notifications
-- Bonus energy-harvesting estimation API in C++
-- Automated Crow API build and testing
+Install the following:
 
-## Project Structure
-
-```text
-kinetic-loop/
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx
-│   │   └── App.css
-│   └── package.json
-├── backend/
-│   ├── server.js
-│   └── package.json
-├── crow-api/
-│   ├── main.cpp
-│   └── CMakeLists.txt
-├── .github/
-│   └── workflows/
-│       └── crow-build.yml
-├── API_DOCUMENTATION.md
-└── README.md
-```
-
-## Prerequisites
-
-To run the frontend and backend locally, install:
-
-- Node.js and npm
 - Git
-- Access to a PostgreSQL database
-- Access to Redis (optional for local development)
+- Docker Desktop with Docker Compose
+- Jenkins with Git and Pipeline plugins
 
-To compile the C++ bonus API, use a Linux environment
-with a C++17 compiler, CMake, and the required dependencies.
+Ensure Docker Desktop is running before starting the application.
 
-## Frontend Setup
+## 2. Project Setup
 
-Open a terminal in the project root.
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Vite will display a local development URL, typically:
-
-http://localhost:5173
-
-Open that URL in your browser.
-
-To build the frontend:
+Clone the repository:
 
 ```bash
-npm run build
+git clone -b dev https://github.com/shreyas029/Kinetic-DevOps.git
+cd Kinetic-DevOps
 ```
 
-## Backend Setup
+This repository is private, so GitHub authentication and repository access are required.
 
-Open a separate terminal in the project root.
-
-```bash
-cd backend
-npm install
-```
-
-Configure the following environment variables:
-
-| Variable | Description |
-|---|---|
-| DATABASE_URL | PostgreSQL connection string |
-| REDIS_URL | Redis connection string |
-| PORT | Optional server port (default 5000) |
-
-For local development, create a `backend/.env` file
-containing your own connection strings.
-
-Example (replace placeholders with your credentials):
+Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
-REDIS_URL=redis://HOST:6379
-PORT=5000
+POSTGRES_PASSWORD=replace_with_a_strong_password
 ```
 
-The current backend reads environment variables from
-`process.env`. A local `.env` file must be loaded using
-Node.js environment-file support or another compatible
-method.
+Replace the example value with your own secure password.
 
-For example, with a supported Node.js version:
+Do not commit `.env` files or credentials to Git.
+
+## 3. Build and Run with Docker Compose
+
+Build the application images:
 
 ```bash
-node --env-file=.env server.js
+docker compose build
 ```
 
-Alternatively, configure the variables in your terminal
-or hosting environment.
-
-Never commit `.env` files or real credentials to GitHub.
-
-Start the backend:
+Start all services:
 
 ```bash
-npm start
+docker compose up -d
 ```
 
-The backend initializes the PostgreSQL orders table
-during startup.
-
-Note: The frontend currently uses the deployed Render
-backend URL. To use a local backend, update the API
-URLs in `frontend/src/App.jsx`.
-
-## PostgreSQL
-
-PostgreSQL stores customer test orders in the `orders`
-table.
-
-The table is created automatically when the backend
-starts, if it does not already exist.
-
-The backend uses parameterized SQL queries for order
-insertion.
-
-## Redis Caching
-
-The `/api/products` endpoint caches the product catalog
-in Redis.
-
-- Cache key: `kinetic-loop:products`
-- Expiration: 300 seconds
-- Cache failures fall back to the normal product catalog
-
-Redis connection is configured using `REDIS_URL`.
-
-## WebSockets
-
-The Node.js backend provides a WebSocket endpoint:
-
-wss://kinetic-loop-backend.onrender.com/ws
-
-On connection, the client receives a `CONNECTED` event.
-
-After a successful test order, connected clients receive
-a `NEW_ORDER` notification containing the order ID and
-status.
-
-The WebSocket endpoint is intended for demonstration
-and does not currently require authentication.
-
-## Bonus: C++ Crow Framework API
-
-The bonus API is located in `crow-api/`.
-
-Endpoints:
-
-- GET /
-- GET /api/energy/{steps}
-
-Example:
-
-GET /api/energy/1000
-
-The API returns an illustrative estimate of motion
-energy harvesting.
-
-This is a demonstration formula, not a scientifically
-validated energy measurement.
-
-### Build on Linux
-
-Install a C++17 compiler, CMake, Git, and the required
-Asio and SSL development packages.
-
-From the project root:
+Alternatively, build and start together:
 
 ```bash
-cmake -S crow-api -B crow-api/build
-cmake --build crow-api/build
-./crow-api/build/kinetic-loop-crow
+docker compose up -d --build
 ```
 
-The Crow API uses port 8080 by default.
+Check service status:
 
-### Automated Testing
+```bash
+docker compose ps
+```
 
-GitHub Actions automatically builds and tests the Crow
-API when changes are pushed to the `dev` branch.
+Access the application:
 
-Workflow file:
+- Frontend: http://localhost:8080
+- Backend API: http://localhost:5000/api/products
 
-`.github/workflows/crow-build.yml`
+The Docker Compose configuration starts four services:
 
-The Crow API is tested in CI but is not currently
-deployed as a public web service.
+1. Frontend — React application served by Nginx.
+2. Backend — Node.js and Express API.
+3. PostgreSQL — Application database with persistent storage.
+4. Redis — Cache service.
 
-## API Documentation
+Stop the services:
 
-Detailed REST API, WebSocket, PostgreSQL, Redis, and
-Crow endpoint information is available in:
+```bash
+docker compose down
+```
 
-[API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+The PostgreSQL named volume is preserved by this command.
 
-## Live Deployment
+## 4. Docker Configuration
 
-Frontend:
-https://kinetic-loop-frontend.onrender.com/
+- `frontend/Dockerfile` builds the React application and serves it through Nginx.
+- `backend/Dockerfile` installs production dependencies and runs the Express server.
+- `compose.yml` defines the frontend, backend, PostgreSQL, and Redis services.
+- `jenkins/Dockerfile` creates a Jenkins image with Docker CLI and Docker Compose.
 
-Backend:
-https://kinetic-loop-backend.onrender.com/
+## 5. Jenkins CI Pipeline
 
-Products API:
-https://kinetic-loop-backend.onrender.com/api/products
+The pipeline configuration is stored in the root `Jenkinsfile`.
 
-Source code:
-https://github.com/shreyas029/Kinetic-Loop/tree/dev
+The Jenkins pipeline has exactly three stages:
 
-GitHub Actions:
-https://github.com/shreyas029/Kinetic-Loop/actions
+### Stage 1 — Checkout
 
-Render free services may take additional time to
-respond after periods of inactivity.
+- Connects to the private GitHub repository.
+- Uses the Jenkins credential `kinetic-github-token`.
+- Checks out the latest source code from the `dev` branch.
 
-## Testing
+### Stage 2 — Build
 
-The following tests have been completed:
+- Uses the Jenkins credential `kinetic-postgres-password`.
+- Runs `docker compose build`.
+- Builds the frontend and backend Docker images.
 
-- Frontend production build
-- Backend JavaScript syntax check
-- PostgreSQL initialization
-- Successful test order insertion
-- Product API responses
-- Redis connection
-- WebSocket connection
-- Real-time NEW_ORDER notification
-- Crow API compilation and automated endpoint tests
-- Live frontend demo checkout
+### Stage 3 — Deploy
 
-Redis cache hits have not been independently verified.
+- Uses the Jenkins credential `kinetic-postgres-password`.
+- Copies `compose.yml` to the predefined deployment directory.
+- Starts or updates the application containers with Docker Compose.
 
-## Important Limitations
+Predefined local deployment directory inside the Jenkins container:
 
-KINETIC LOOP is an academic prototype.
+```text
+/var/jenkins_home/deploy/kinetic-loop
+```
 
-- Checkout creates test orders only.
-- No real payment processing is implemented.
-- The order endpoint is not authenticated.
-- WebSocket notifications are not authenticated.
-- The Crow API is not publicly deployed.
-- Do not enter real customer or payment information.
+The directory is stored in the persistent `jenkins_home` Docker volume.
 
-Production deployment would require authentication,
-authorization, stronger input validation, rate limiting,
-and additional security controls.
+The Compose project name is `kinetic-loop-devops`.
 
-## Project Status
+## 6. Jenkins Setup
 
-The main assignment technology requirements have been
-implemented, and the C++ Crow bonus API has passed
-automated build and endpoint tests.
+Build the custom Jenkins image:
+
+```bash
+docker build -t kinetic-jenkins-docker:latest ./jenkins
+```
+
+Create persistent Jenkins storage:
+
+```bash
+docker volume create jenkins_home
+```
+
+Start Jenkins for a trusted local development environment:
+
+```bash
+docker run -d --name kinetic-jenkins --restart unless-stopped --user root -p 8081:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock kinetic-jenkins-docker:latest
+```
+
+Open Jenkins at:
+
+http://localhost:8081
+
+Complete the initial Jenkins setup and install the suggested plugins.
+
+Configure two Jenkins credentials:
+
+| Credential ID | Type | Purpose |
+| --- | --- | --- |
+| `kinetic-github-token` | Username with password | GitHub username and read-only personal access token for the private repository |
+| `kinetic-postgres-password` | Secret text | PostgreSQL password matching the local `.env` value |
+
+Create a Jenkins job of type **Pipeline**.
+
+Configure the job:
+
+- Definition: Pipeline script from SCM
+- SCM: Git
+- Repository URL: https://github.com/shreyas029/Kinetic-DevOps.git
+- Credentials: `kinetic-github-token`
+- Branch Specifier: `*/dev`
+- Script Path: `Jenkinsfile`
+
+Save the job and click **Build Now**.
+
+A successful build completes Checkout, Build, and Deploy.
+
+**Security note:** Docker socket access and running Jenkins as root provide extensive control over the Docker host. This configuration is intended only for a trusted local internship demonstration, not a public production server.
+
+## 7. Verification
+
+After the Jenkins pipeline succeeds, run:
+
+```bash
+docker compose ps
+```
+
+Confirm that frontend, backend, PostgreSQL, and Redis are running, and that PostgreSQL is healthy.
+
+Then verify:
+
+- http://localhost:8080
+- http://localhost:5000/api/products
+
+## 8. Git Commands
+
+All assignment changes are committed using Git commands:
+
+```bash
+git status
+git add README.md
+git commit -m "Document Docker setup and Jenkins CI pipeline"
+git push origin dev
+```
+
+## Assignment Deliverables
+
+- Backend and frontend Dockerfiles
+- Docker Compose configuration
+- Jenkins CI configuration (`Jenkinsfile`)
+- Docker-enabled Jenkins configuration
+- README with setup, build, run, and CI stage explanations
