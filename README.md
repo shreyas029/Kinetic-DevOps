@@ -1,4 +1,4 @@
-﻿# Kinetic Loop — DevOps Internship Assignment
+﻿# Kinetic Loop — DevOps Assignment
 
 ## Project Overview
 
